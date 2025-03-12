@@ -1,0 +1,2 @@
+import{r as x,i as l,j as B,k as N}from"./index-UUiNTc0V.js";import{u as $}from"./Button-CuaOUBT4.js";const j=x.forwardRef(({as:r,bsPrefix:m,variant:o="primary",size:e,active:n=!1,disabled:t=!1,className:f,...s},u)=>{const a=l(m,"btn"),[c,{tagName:p}]=$({tagName:r,disabled:t,...s}),i=p;return B.jsx(i,{...c,...s,ref:u,disabled:t,className:N(f,a,n&&"active",o&&`${a}-${o}`,e&&`${a}-${e}`,s.href&&t&&"disabled")})});j.displayName="Button";export{j as B};
+//# sourceMappingURL=Button-BLYS8AP-.js.map

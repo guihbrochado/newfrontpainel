@@ -1,0 +1,2 @@
+import{j as r,C as i,c as t,e as d,f as o}from"./index-UUiNTc0V.js";import{B as c}from"./Button-BLYS8AP-.js";const C=({title:e,children:s,showAddButton:a,onAddClick:n})=>r.jsxs(i,{children:[r.jsx(t,{children:r.jsxs("div",{className:"d-flex justify-content-between align-items-center",children:[r.jsx(d,{children:e}),a&&r.jsx(c,{variant:"primary",onClick:n,children:"Adicionar"})]})}),r.jsx(o,{children:s})]});export{C};
+//# sourceMappingURL=ComponentContainerCard-DfvpmWMm.js.map
