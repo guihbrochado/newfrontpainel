@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent, ChangeEvent, useEffect } from "react"; // Adicione useEffect
 import { Form, Button, Alert, Col, Row } from "react-bootstrap";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext"; // Importe o contexto de autenticação
 import ComponentContainerCard from "@/components/ComponentContainerCard";
 import PageMetaData from "@/components/PageMetaData";
 
@@ -17,6 +18,7 @@ interface BannerForm {
 }
 
 const CriarBanner = () => {
+  const { user } = useAuthContext(); // Pegue o usuário do contexto
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BannerForm>({
     title: "",
@@ -28,6 +30,9 @@ const CriarBanner = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Verifica permissão ao carregar o componente
+  
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
@@ -64,6 +69,10 @@ const CriarBanner = () => {
       setError(error.response?.data?.message || "Erro ao criar banner.");
     }
   };
+
+  if (!user || user.role !== "Administrador") {
+    return <Alert variant="danger">{error || "Acesso negado."}</Alert>;
+  }
 
   return (
     <>

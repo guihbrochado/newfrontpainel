@@ -56,8 +56,8 @@ const CreatePost = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/posts-categories",
-          { headers: { Authorization: `Bearer ${token}` } }
+          "http://localhost/myNewApi-1/public/api/categorias", // Alterado para rota pública
+          { headers: { Authorization: `Bearer ${token}` } } // Token ainda enviado, mas opcional
         );
         setCategories(response.data);
       } catch (err) {
@@ -98,7 +98,11 @@ const CreatePost = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+  
+    const token = localStorage.getItem("token");
+    console.log("Token enviado:", token);
+    console.log("Usuário atual:", user);
+  
     exportHtml(async (html) => {
       const formData = new FormData();
       formData.append("title", title);
@@ -108,17 +112,13 @@ const CreatePost = () => {
       formData.append("status", status);
       formData.append("video_url", videoUrl);
       formData.append("audio_url", audioUrl);
-
-      if (tags) {
-        formData.append("tags", tags);
-      }
-
+  
+      if (tags) formData.append("tags", tags);
       if (scheduleDate) formData.append("schedule_date", scheduleDate);
       if (image) formData.append("image", image);
-
+  
       try {
-        const token = localStorage.getItem("token");
-        await axios.post(
+        const response = await axios.post(
           "http://localhost/myNewApi-1/public/api/posts",
           formData,
           {
@@ -132,7 +132,12 @@ const CreatePost = () => {
         setTimeout(() => navigate("/admin/posts"), 2000);
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
-        setError(error.response?.data?.message || "Erro ao criar o post.");
+        const errorMessage = error.response?.data?.message || "Erro ao criar o post.";
+        if (errorMessage.includes("Duplicate entry")) {
+          setError("Já existe um post com esse título. Por favor, use um título diferente.");
+        } else {
+          setError(errorMessage);
+        }
       }
     });
   };
@@ -236,7 +241,7 @@ const CreatePost = () => {
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  placeholder="Exemplo: Laravel, React, Backend"
+                  placeholder="Exemplo: Esporte, Economia, Tecnologia"
                 />
               </Form.Group>
 

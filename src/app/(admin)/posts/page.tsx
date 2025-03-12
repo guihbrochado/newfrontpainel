@@ -19,7 +19,7 @@ const ListaPosts = () => {
   const { user } = useAuthContext();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [archivedPosts, setArchivedPosts] = useState<Post[]>([]); // Tornar mutável
+  const [archivedPosts, setArchivedPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Record<string, string>>({});
   const [erro, setErro] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<string | null>(null);
@@ -67,7 +67,9 @@ const ListaPosts = () => {
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const postsArray = response.data?.data?.data || response.data?.data || [];
+        console.log("Resposta da API:", response.data);
+        // Ajuste para lidar com resposta paginada ou array direto
+        const postsArray = response.data?.data?.data || response.data?.data || response.data || [];
         setPosts(postsArray);
       } catch (error) {
         console.error("Erro ao buscar posts:", error);
@@ -82,7 +84,7 @@ const ListaPosts = () => {
         const response = await axios.get("http://localhost/myNewApi-1/public/api/posts/archived", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const archivedArray = response.data?.data?.data || response.data?.data || [];
+        const archivedArray = response.data?.data?.data || response.data?.data || response.data || [];
         setArchivedPosts(archivedArray);
       } catch (error) {
         console.error("Erro ao buscar posts arquivados:", error);
