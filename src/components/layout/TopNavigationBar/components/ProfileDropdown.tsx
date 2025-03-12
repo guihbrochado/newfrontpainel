@@ -33,26 +33,7 @@ const ProfileDropdown = () => {
             <small className="text-muted mb-0">{user?.role || "Membro"}</small>
           </div>
         </div>
-        <DropdownDivider className="mt-0" />
-        <small className="text-muted px-2 pb-1 d-block">Account</small>
-        <DropdownItem href="/pages/profile">
-          <IconifyIcon icon="la:user" className="fs-18 me-1 align-text-bottom" /> Profile
-        </DropdownItem>
-        <DropdownItem href="/pages/faqs">
-          <IconifyIcon icon="la:wallet" className="fs-18 me-1 align-text-bottom" /> Earning
-        </DropdownItem>
-        <small className="text-muted px-2 py-1 d-block">Settings</small>
-        <DropdownItem href="/pages/profile">
-          <IconifyIcon icon="la:cog" className="fs-18 me-1 align-text-bottom" />
-          Account Settings
-        </DropdownItem>
-        <DropdownItem href="/pages/profile">
-          <IconifyIcon icon="la:lock" className="fs-18 me-1 align-text-bottom" /> Security
-        </DropdownItem>
-        <DropdownItem href="/pages/faqs">
-          <IconifyIcon icon="la:question-circle" className="fs-18 me-1 align-text-bottom" /> Help Center
-        </DropdownItem>
-        <DropdownDivider className="mb-0" />
+        
         <DropdownItem className="text-danger" onClick={handleLogout}>
           <IconifyIcon icon="la:power-off" className="fs-18 me-1 align-text-bottom" /> Logout
         </DropdownItem>
