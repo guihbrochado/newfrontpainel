@@ -1,0 +1,2 @@
+import{j as r,C as i,c as t,e as d,f as o}from"./index-BCS0cig_.js";import{B as c}from"./Button-DeQEhl8G.js";const C=({title:e,children:s,showAddButton:a,onAddClick:n})=>r.jsxs(i,{children:[r.jsx(t,{children:r.jsxs("div",{className:"d-flex justify-content-between align-items-center",children:[r.jsx(d,{children:e}),a&&r.jsx(c,{variant:"primary",onClick:n,children:"Adicionar"})]})}),r.jsx(o,{children:s})]});export{C};
+//# sourceMappingURL=ComponentContainerCard-Cb_e9E7o.js.map

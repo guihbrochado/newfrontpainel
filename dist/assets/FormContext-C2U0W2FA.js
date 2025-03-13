@@ -1,0 +1,2 @@
+import{r as s,j as i,k as m,P as e}from"./index-BCS0cig_.js";const n={type:e.string,tooltip:e.bool,as:e.elementType},a=s.forwardRef(({as:o="div",className:t,type:p="valid",tooltip:r=!1,...c},l)=>i.jsx(o,{...c,ref:l,className:m(t,`${p}-${r?"tooltip":"feedback"}`)}));a.displayName="Feedback";a.propTypes=n;const x=s.createContext({});export{a as F,x as a};
+//# sourceMappingURL=FormContext-C2U0W2FA.js.map

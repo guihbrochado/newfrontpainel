@@ -34,13 +34,15 @@ const ListaUsuarios = () => {
     password: "",
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchUsuarios = async () => {
       const token = localStorage.getItem("token");
 
       try {
         const userResponse = await axios.get(
-          "http://localhost/myNewApi-1/public/api/user",
+          `${API_URL}/user`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setRole(userResponse.data.role);
@@ -51,7 +53,7 @@ const ListaUsuarios = () => {
         }
 
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/users",
+          `${API_URL}/users`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUsuarios(response.data);
@@ -70,7 +72,7 @@ const ListaUsuarios = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.delete(
-        `http://localhost/myNewApi-1/public/api/users/${id}`,
+        `${API_URL}/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMensagem("Usuário excluído com sucesso!");
@@ -100,7 +102,7 @@ const ListaUsuarios = () => {
 
     try {
       await axios.put(
-        `http://localhost/myNewApi-1/public/api/users/${usuarioEdit.id}`,
+       `${API_URL}/users/${usuarioEdit.id}`,
         updateData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

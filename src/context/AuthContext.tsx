@@ -16,6 +16,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("🔹 Buscando usuário com token:", token);
       const response = await axios.get(
-        "http://localhost/myNewApi-1/public/api/user",
+        `${API_URL}/user`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("✅ Resposta completa da API:", response.data);
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("🔍 Enviando requisição para login:", { email, password });
       const response = await axios.post(
-        "http://localhost/myNewApi-1/public/api/login",
+        `${API_URL}/login`,
         { email, password },
         {
           headers: {
@@ -107,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("🔹 Fazendo logout...");
       await axios.post(
-        "http://localhost/myNewApi-1/public/api/logout",
+        `${API_URL}/logout`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

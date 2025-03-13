@@ -12,18 +12,18 @@ type AuthorData = {
 
 const AuthorRanking = () => {
   const [authors, setAuthors] = useState<AuthorData[]>([]);
-  const [period, setPeriod] = useState('month'); // Período padrão: último mês
+  const [period, setPeriod] = useState('month');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
-  // Função para buscar os dados da API
   const fetchTopAuthors = async (selectedPeriod: string) => {
     try {
       setLoading(true);
       setError(null);
 
       console.log(`Buscando autores para período: ${selectedPeriod}`);
-      const response = await fetch(`http://localhost/myNewApi-1/public/api/posts/top-authors?period=${selectedPeriod}`);
+      const response = await fetch(`${API_URL}/posts/top-authors?period=${selectedPeriod}`);
 
       if (!response.ok) {
         console.error('Erro na resposta da API:', response);

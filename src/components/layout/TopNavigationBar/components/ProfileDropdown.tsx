@@ -9,7 +9,7 @@ const ProfileDropdown = () => {
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
 
   const userImage = user?.profile_photo_path
-    ? `http://localhost/myNewApi-1/storage/${user.profile_photo_path}`
+    ? `https://webapp396758.ip-45-33-113-78.cloudezapp.io/storage/${user.profile_photo_path}`
     : null;
 
   const handleLogout = () => {

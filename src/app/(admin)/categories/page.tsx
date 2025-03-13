@@ -15,6 +15,7 @@ const CategoriesPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: "", color: "#000000" });
   const [editCategory, setEditCategory] = useState({ id: "", name: "", color: "#000000" });
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -24,7 +25,7 @@ const CategoriesPage = () => {
       }
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost/myNewApi-1/public/api/posts-categories", {
+        const response = await axios.get(`${API_URL}/posts-categories`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -52,7 +53,7 @@ const CategoriesPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost/myNewApi-1/public/api/posts-categories",
+        `${API_URL}/posts-categories`,
         { name: newCategory.name, color: newCategory.color },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
@@ -61,7 +62,7 @@ const CategoriesPage = () => {
       setShowCreateModal(false);
       setNewCategory({ name: "", color: "#000000" });
   
-      const updatedCategories = await axios.get("http://localhost/myNewApi-1/public/api/posts-categories", {
+      const updatedCategories = await axios.get(`${API_URL}/posts-categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategories(updatedCategories.data);
@@ -86,7 +87,7 @@ const CategoriesPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost/myNewApi-1/public/api/posts-categories/${editCategory.id}`,
+        `${API_URL}/posts-categories/${editCategory.id}`,
         { name: editCategory.name, color: editCategory.color },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
@@ -94,7 +95,7 @@ const CategoriesPage = () => {
       setMessage("Categoria atualizada com sucesso!");
       setShowEditModal(false);
   
-      const updatedCategories = await axios.get("http://localhost/myNewApi-1/public/api/posts-categories", {
+      const updatedCategories = await axios.get(`${API_URL}/posts-categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategories(updatedCategories.data);
@@ -118,7 +119,7 @@ const CategoriesPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost/myNewApi-1/public/api/posts-categories/${categoryId}`, {
+      await axios.delete(`${API_URL}/posts-categories/${categoryId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

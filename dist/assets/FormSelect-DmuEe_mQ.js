@@ -1,0 +1,2 @@
+import{r as t,i as p,j as d,k as f}from"./index-BCS0cig_.js";import{a as x}from"./FormContext-C2U0W2FA.js";const u=t.forwardRef(({bsPrefix:s,size:e,htmlSize:a,className:o,isValid:r=!1,isInvalid:l=!1,id:m,...c},i)=>{const{controlId:n}=t.useContext(x);return s=p(s,"form-select"),d.jsx("select",{...c,size:a,ref:i,className:f(o,s,e&&`${s}-${e}`,r&&"is-valid",l&&"is-invalid"),id:m||n})});u.displayName="FormSelect";export{u as F};
+//# sourceMappingURL=FormSelect-DmuEe_mQ.js.map

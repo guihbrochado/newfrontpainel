@@ -65,6 +65,9 @@ const EditarPost = () => {
 
   const emailEditorRef = useRef<EditorRef>(null);
 
+  // Definir a URL base da API a partir da variável de ambiente
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (loading || !user) {
       setError("Usuário não autenticado.");
@@ -79,13 +82,14 @@ const EditarPost = () => {
     const fetchPost = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Token usado:", token);
         const response = await axios.get(
-          `http://localhost/myNewApi-1/public/api/posts/${postId}`,
+          `${API_URL}/posts/${postId}`, // Usar a variável de ambiente
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const post: Post = response.data.data;
         console.log("Dados recebidos do post:", post);
-
+    
         setTitle(post.title || "");
         setSubtitle(post.subtitle || "");
         setVideoUrl(post.video_url || "");
@@ -110,7 +114,7 @@ const EditarPost = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/posts-categories",
+          `${API_URL}/posts-categories`, // Usar a variável de ambiente
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCategories(response.data);
@@ -159,7 +163,7 @@ const EditarPost = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-
+  
     exportHtml(async (html, exportedDesign) => {
       const formData = new FormData();
       formData.append("title", title);
@@ -172,14 +176,13 @@ const EditarPost = () => {
       formData.append("tags", tags);
       if (scheduleDate) formData.append("schedule_date", scheduleDate);
       if (image) formData.append("image", image);
-      if (video) formData.append("video", video);
       if (exportedDesign) formData.append("design", JSON.stringify(exportedDesign));
-
+  
       try {
         const token = localStorage.getItem("token");
         console.log("Enviando dados para atualização:", Object.fromEntries(formData));
         const response = await axios.put(
-          `http://localhost/myNewApi-1/public/api/posts/${postId}`,
+          `${API_URL}/posts/${postId}`, // Usar a variável de ambiente
           formData,
           {
             headers: {
@@ -194,8 +197,8 @@ const EditarPost = () => {
         setTimeout(() => navigate("/admin/posts"), 2000);
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
+        console.log("Erro completo:", error.response);
         setError(error.response?.data?.message || "Erro ao atualizar o post.");
-        console.error("Erro na requisição PUT:", error.response?.data || error.message);
       }
     });
   };
@@ -213,10 +216,10 @@ const EditarPost = () => {
   if (loading) {
     return (
       <Row className="justify-content-center">
-        <Col md={12} lg={12}>
-          <div>Carregando...</div>
-        </Col>
-      </Row>
+      <Col md={12} lg={12}>
+        <div>Carregando...</div>
+      </Col>
+    </Row>
     );
   }
 

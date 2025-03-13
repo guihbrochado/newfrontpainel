@@ -31,6 +31,8 @@ const CriarBanner = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     setFormData((prev) => ({
@@ -60,7 +62,7 @@ const CriarBanner = () => {
     try {
         const token = localStorage.getItem("token");
         const response = await axios.post(
-            "http://localhost/myNewApi-1/public/api/banners",
+            `${API_URL}/banners`,
             data,
             { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
         );

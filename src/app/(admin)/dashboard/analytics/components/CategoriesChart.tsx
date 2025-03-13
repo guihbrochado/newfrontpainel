@@ -9,14 +9,14 @@ const CategoriesChart = () => {
   const [values, setValues] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const API_URL = import.meta.env.VITE_API_URL;
 
-  // Buscar categorias mais visualizadas
   const fetchCategories = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const response = await fetch('http://localhost/myNewApi-1/public/api/posts/most-viewed-categories')
+      const response = await fetch(`${API_URL}/posts/most-viewed-categories`)
       if (!response.ok) throw new Error('Erro ao buscar categorias')
 
       const data = await response.json()

@@ -32,9 +32,10 @@ const CriarUsuario = () => {
     email: "",
     password: "",
     role: "Usuário Restrito",
-    profile_photo: null, // Armazena a imagem
+    profile_photo: null,
   });
-
+  
+  const API_URL = import.meta.env.VITE_API_URL;
   const [preview, setPreview] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState("");
   const [roleUsuario, setRoleUsuario] = useState("");
@@ -45,7 +46,7 @@ const CriarUsuario = () => {
       const token = localStorage.getItem("token");
 
       try {
-        const response = await axios.get("http://localhost/myNewApi-1/public/api/user", {
+        const response = await axios.get(`${API_URL}/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 	console.log(response.data);
@@ -101,7 +102,7 @@ const CriarUsuario = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost/myNewApi-1/public/api/users", formDataObj, {
+      const response = await axios.post(`${API_URL}/users`, formDataObj, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "multipart/form-data",

@@ -25,8 +25,10 @@ const BannersAnalytics = () => {
   const [endDate, setEndDate] = useState("");
   const [position, setPosition] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState(""); // Novo estado para mensagens
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchReport = async () => {
     setLoading(true);
@@ -34,12 +36,12 @@ const BannersAnalytics = () => {
     console.log("Parâmetros enviados:", { startDate, endDate, position });
 
     try {
-      const response = await axios.get("http://localhost/myNewApi-1/public/api/banners/reports", {
+      const response = await axios.get(`${API_URL}/banners/reports`, {
         params: { 
           start_date: startDate, 
           end_date: endDate, 
           position,
-          timestamp: new Date().getTime() // Evita cache
+          timestamp: new Date().getTime()
         },
         headers: { 
           Authorization: `Bearer ${token}`,

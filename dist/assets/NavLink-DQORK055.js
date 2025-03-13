@@ -1,0 +1,2 @@
+import{r as f,i as v,j as N,k}from"./index-BCS0cig_.js";import{A as p}from"./Anchor-DDbQbNtO.js";import{u as l}from"./NavItem-YjHbLWYX.js";import{m as u}from"./NavContext-3NvzG64K.js";const x=f.forwardRef(({bsPrefix:a,className:t,as:r=p,active:m,eventKey:o,disabled:s=!1,...e},i)=>{a=v(a,"nav-link");const[n,c]=l({key:u(o,e.href),active:m,disabled:s,...e});return N.jsx(r,{...e,...n,ref:i,disabled:s,className:k(t,a,s&&"disabled",c.isActive&&"active")})});x.displayName="NavLink";export{x as N};
+//# sourceMappingURL=NavLink-DQORK055.js.map

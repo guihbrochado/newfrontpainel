@@ -1,0 +1,2 @@
+import{r as e,G as a}from"./index-BCS0cig_.js";function c(){return e.useState(null)}const s=typeof global<"u"&&global.navigator&&global.navigator.product==="ReactNative",i=typeof document<"u",r=i||s?e.useLayoutEffect:e.useEffect;function f(t,n){if(t.contains)return t.contains(n);if(t.compareDocumentPosition)return t===n||!!(t.compareDocumentPosition(n)&16)}const o=e.createContext(a?window:void 0);o.Provider;function l(){return e.useContext(o)}export{l as a,r as b,f as c,c as u};
+//# sourceMappingURL=useWindow-BOkGfrdz.js.map

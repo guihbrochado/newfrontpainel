@@ -7,11 +7,12 @@ const MostViewedPosts = () => {
   const [posts, setPosts] = useState<{ id: number; title: string; views: number; progress: number; image: string; author: string; }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost/myNewApi-1/public/api/posts-most-viewed');
+        const response = await axios.get(`${API_URL}/posts-most-viewed`);
         if (response.data.status === 'success') {
           setPosts(response.data.data);
         }

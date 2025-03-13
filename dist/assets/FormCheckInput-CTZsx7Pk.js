@@ -1,2 +1,0 @@
-import{r as t,i as l,j as u,k as f}from"./index-UUiNTc0V.js";import{a as x}from"./FormContext-n6TyEwzp.js";const d=t.forwardRef(({id:a,bsPrefix:s,className:o,type:e="checkbox",isValid:r=!1,isInvalid:c=!1,as:i="input",...m},n)=>{const{controlId:p}=t.useContext(x);return s=l(s,"form-check-input"),u.jsx(i,{...m,ref:n,type:e,id:a||p,className:f(o,s,r&&"is-valid",c&&"is-invalid")})});d.displayName="FormCheckInput";export{d as F};
-//# sourceMappingURL=FormCheckInput-CTZsx7Pk.js.map

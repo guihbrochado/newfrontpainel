@@ -19,13 +19,14 @@ const TotalPost = () => {
   const [error, setError] = useState<string | null>(null);
   const [labels, setLabels] = useState<string[]>([]);
   const [values, setValues] = useState<number[]>([]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [totalRes, postsRes] = await Promise.all([
-          axios.get("http://localhost/myNewApi-1/public/api/posts-total"),
-          axios.get("http://localhost/myNewApi-1/public/api/posts-por-mes"),
+          axios.get(`${API_URL}/posts-total`),
+          axios.get(`${API_URL}/posts-por-mes`),
         ]);
         if (totalRes.data.status === "success") setTotais(totalRes.data.data);
         if (postsRes.data.status === "success") {

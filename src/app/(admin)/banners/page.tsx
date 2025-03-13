@@ -65,6 +65,8 @@ const ListaBanners = () => {
     is_active: true,
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (!user) {
       setError("Usuário não autenticado.");
@@ -79,7 +81,7 @@ const ListaBanners = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/banners",
+          `${API_URL}/banners`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const bannersArray = response.data?.data || [];
@@ -167,7 +169,7 @@ const ListaBanners = () => {
 
       if (selectedBanner) {
         const response = await axios.put(
-          `http://localhost/myNewApi-1/public/api/banners/${selectedBanner.id}`,
+          `${API_URL}/banners/${selectedBanner.id}`,
           formData,
           {
             headers: {
@@ -192,7 +194,7 @@ const ListaBanners = () => {
         setMessage("Banner atualizado com sucesso!");
       } else {
         const response = await axios.post(
-          "http://localhost/myNewApi-1/public/api/banners",
+          `${API_URL}/banners`,
           formData,
           {
             headers: {
@@ -219,7 +221,7 @@ const ListaBanners = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.delete(
-        `http://localhost/myNewApi-1/public/api/banners/${banner.id}`,
+        `${API_URL}/banners/${banner.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setBanners(banners.filter((b) => b.id !== banner.id));
@@ -235,8 +237,7 @@ const ListaBanners = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost/myNewApi-1/public/api/banners/${id}/toggle-status`,
-        {},
+        `${API_URL}/banners/${id}/toggle-status`, {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setBanners(
@@ -297,7 +298,7 @@ const ListaBanners = () => {
                   <td>
                     {banner.image_path && (
                       <img
-                        src={`http://localhost/myNewApi-1/storage/app/public/banners/${banner.image_path
+                        src={`${API_URL}/storage/app/public/banners/${banner.image_path
                           .split("/")
                           .pop()}`}
                         alt={banner.title || "Banner"}
@@ -377,7 +378,7 @@ const ListaBanners = () => {
                 />
                 {selectedBanner && selectedBanner.image_path && (
                   <img
-                    src={`http://localhost/myNewApi-1/storage/app/public/banners/${selectedBanner.image_path.split("/").pop()}`}
+                    src={`${API_URL}/storage/app/public/banners/${selectedBanner.image_path.split("/").pop()}`}
                     alt={selectedBanner.title || "Banner"}
                     style={{ maxWidth: "100px", maxHeight: "100px", marginTop: "10px" }}
                   />

@@ -25,6 +25,9 @@ const ListaPosts = () => {
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("publicado");
 
+  // Declaração da variável de ambiente
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (!user) {
       setErro("Usuário não autenticado.");
@@ -39,7 +42,7 @@ const ListaPosts = () => {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/posts-categories",
+          `${API_URL}/posts-categories`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const categoryMap = response.data.reduce(
@@ -57,10 +60,10 @@ const ListaPosts = () => {
 
     const fetchPosts = async () => {
       const token = localStorage.getItem("token");
-      let url = "http://localhost/myNewApi-1/public/api/posts";
+      let url = `${API_URL}/posts`;
 
       if (user.role === "Colunista") {
-        url = "http://localhost/myNewApi-1/public/api/posts/mine";
+        url = `${API_URL}/posts/mine`;
       }
 
       try {
@@ -81,7 +84,7 @@ const ListaPosts = () => {
       if (user.role === "Colunista") return; // Colunistas não veem arquivados
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("http://localhost/myNewApi-1/public/api/posts/archived", {
+        const response = await axios.get(`${API_URL}/posts/archived`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const archivedArray = response.data?.data?.data || response.data?.data || response.data || [];
@@ -111,7 +114,7 @@ const ListaPosts = () => {
     if (!confirm("Tem certeza que deseja excluir este post?")) return;
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost/myNewApi-1/public/api/posts/${postId}`, {
+      await axios.delete(`${API_URL}/posts/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts(posts.filter((post) => post.id !== postId));
@@ -126,7 +129,7 @@ const ListaPosts = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost/myNewApi-1/public/api/posts/${postId}/approve`,
+        `${API_URL}/posts/${postId}/approve`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -142,7 +145,7 @@ const ListaPosts = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost/myNewApi-1/public/api/posts/${postId}/reject`,
+        `${API_URL}/posts/${postId}/reject`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -159,7 +162,7 @@ const ListaPosts = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.patch(
-        `http://localhost/myNewApi-1/public/api/posts/${postId}/archive`,
+        `${API_URL}/posts/${postId}/archive`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

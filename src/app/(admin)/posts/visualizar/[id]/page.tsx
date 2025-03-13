@@ -13,6 +13,7 @@ const VisualizarPost = () => {
   const [post, setPost] = useState(null);
   const [error, setError] = useState("");
   //const [message, setMessage] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (loading || !user) {
@@ -23,7 +24,7 @@ const VisualizarPost = () => {
     const fetchPost = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost/myNewApi-1/public/api/posts/${postId}`, {
+        const response = await axios.get(`${API_URL}/posts/${postId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -73,7 +74,7 @@ const VisualizarPost = () => {
               <p><strong>Status:</strong> {post.status}</p>
               {post.image && (
                 <img
-                  src={`http://localhost/myNewApi-1/storage/${post.image}`}
+                  src={`${API_URL}/storage/${post.image}`}
                   alt={post.title}
                   style={{ maxWidth: "100%", marginBottom: "15px" }}
                 />

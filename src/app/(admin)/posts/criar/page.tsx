@@ -35,6 +35,8 @@ const CreatePost = () => {
   const emailEditorRef = useRef<EditorRef>(null);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     if (loading || !user) {
       setError("Usuário não autenticado.");
@@ -46,8 +48,7 @@ const CreatePost = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/categorias",
-          { headers: { Authorization: `Bearer ${token}` } }
+          `${API_URL}/categorias`, { headers: { Authorization: `Bearer ${token}` } }
         );
         setCategories(response.data);
       } catch (err) {
@@ -116,7 +117,7 @@ const CreatePost = () => {
 
       try {
         const response = await axios.post(
-          "http://localhost/myNewApi-1/public/api/posts",
+          `${API_URL}/posts`,
           formData,
           {
             headers: {
@@ -193,7 +194,7 @@ const CreatePost = () => {
                   <Button
                     variant="secondary"
                     className="mb-2 me-2"
-                    onClick={() => exportHtml(() => {})}
+                    onClick={() => exportHtml(() => { })}
                   >
                     Export HTML
                   </Button>
