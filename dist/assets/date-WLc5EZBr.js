@@ -1,2 +1,0 @@
-const c=(t,a,e=new Date)=>new Date(new Date().setDate(e.getDate()-t)),i=(t,a,e=new Date)=>new Date(new Date().setMinutes(e.getMinutes()-t)),u=t=>{typeof t!="object"&&(t=new Date(t));const a=Math.floor((new Date().valueOf()-t.valueOf())/1e3);let e=0,n="";const r={year:31536e3,month:2592e3,day:86400,hour:3600,minute:60,second:1};for(const[o,s]of Object.entries(r))if(e=Math.floor(a/s),e>=1){n=o;break}return(e>1||e===0)&&(n+="s"),`${e} ${n} ago`};export{i as a,c as b,u as t};
-//# sourceMappingURL=date-WLc5EZBr.js.map
