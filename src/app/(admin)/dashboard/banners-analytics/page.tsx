@@ -10,12 +10,11 @@ const calculateCTR = (clicks: number, views: number) => {
   return ((clicks / views) * 100).toFixed(2) + "%";
 };
 
-// Função para formatar a data no formato DD/MM/YYYY
 const formatDate = (dateString: string | null) => {
-  if (!dateString) return "N/A"; // Retorna "N/A" se a data for null ou undefined
+  if (!dateString) return "N/A";
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() é 0-based
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
@@ -26,35 +25,49 @@ const BannersAnalytics = () => {
   const [endDate, setEndDate] = useState("");
   const [position, setPosition] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState(""); // Novo estado para mensagens
   const [loading, setLoading] = useState(false);
+
+  const fetchReport = async () => {
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    console.log("Parâmetros enviados:", { startDate, endDate, position });
+
+    try {
+      const response = await axios.get("http://localhost/myNewApi-1/public/api/banners/reports", {
+        params: { 
+          start_date: startDate, 
+          end_date: endDate, 
+          position,
+          timestamp: new Date().getTime() // Evita cache
+        },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache"
+        },
+      });
+
+      console.log("Dados recebidos:", response.data);
+      setReportData(response.data.data);
+      setMessage(response.data.message || ""); // Define a mensagem retornada pelo backend
+      setError("");
+    } catch (err) {
+      setError("Erro ao carregar os relatórios.");
+      console.error("Erro na requisição:", err);
+      setMessage("");
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchReport();
   }, []);
 
-  const fetchReport = async () => {
-    setLoading(true);
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await axios.get("http://localhost/myNewApi-1/public/api/banners/reports", {
-        params: { start_date: startDate, end_date: endDate, position },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setReportData(response.data.data);
-      setError("");
-    } catch (err) {
-      setError("Erro ao carregar os relatórios.");
-    }
-    setLoading(false);
-  };
-
   return (
     <ComponentContainerCard title="Análises de Banners">
       {error && <Alert variant="danger">{error}</Alert>}
+      {message && !error && <Alert variant="info">{message}</Alert>} {/* Exibe mensagens como "Nenhum banner encontrado" */}
 
-      {/* Filtros */}
       <Form className="mb-3">
         <div className="d-flex gap-2">
           <Form.Group controlId="startDate">
@@ -92,7 +105,6 @@ const BannersAnalytics = () => {
         </div>
       </Form>
 
-      {/* Tabela de Relatórios */}
       {loading ? (
         <p>Carregando...</p>
       ) : (
@@ -110,18 +122,26 @@ const BannersAnalytics = () => {
             </tr>
           </thead>
           <tbody>
-            {reportData.map((banner, idx) => (
-              <tr key={idx}>
-                <td>{banner.id}</td>
-                <td>{banner.title}</td>
-                <td>{banner.position}</td>
-                <td>{banner.clicks}</td>
-                <td>{banner.views}</td>
-                <td>{calculateCTR(banner.clicks, banner.views)}</td>
-                <td>{formatDate(banner.start_date)}</td> {/* Data formatada */}
-                <td>{formatDate(banner.end_date)}</td>   {/* Data formatada */}
+            {reportData.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="text-center">
+                  Nenhum dado encontrado.
+                </td>
               </tr>
-            ))}
+            ) : (
+              reportData.map((banner, idx) => (
+                <tr key={idx}>
+                  <td>{banner.id}</td>
+                  <td>{banner.title}</td>
+                  <td>{banner.position}</td>
+                  <td>{banner.clicks}</td>
+                  <td>{banner.views}</td>
+                  <td>{calculateCTR(banner.clicks, banner.views)}</td>
+                  <td>{formatDate(banner.start_date)}</td>
+                  <td>{formatDate(banner.end_date)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </Table>
       )}
