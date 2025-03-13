@@ -35,11 +35,7 @@ const LoginForm = () => {
             </label>
           </div>
         </Col>
-        <Col sm={6} className="text-end">
-          <Link to="/auth/reset-pass" className="text-muted font-13">
-            Esqueceu a senha?
-          </Link>
-        </Col>
+        
       </div>
 
       <div className="form-group mb-0 row">

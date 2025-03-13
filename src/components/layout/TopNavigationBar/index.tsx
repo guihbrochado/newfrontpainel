@@ -1,4 +1,3 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import useScrollEvent from '@/hooks/useScrollEvent'
 import clsx from 'clsx'
 import LeftSideBarToggle from './components/LeftSideBarToggle'
@@ -20,7 +19,7 @@ const TopNavigationBar = () => {
 
             <li className="mx-3 welcome-text">
               <h3 className="mb-0 fw-bold text-truncate">
-                {loading ? 'Carregando...' : `Bom dia, ${userName}!`}
+                {loading ? 'Carregando...' : `Olá, ${userName}!`}
               </h3>
             </li>
           </ul>

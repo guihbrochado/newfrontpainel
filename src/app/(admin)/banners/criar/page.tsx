@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent, useEffect } from "react"; // Adicione useEffect
+import { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { Form, Button, Alert, Col, Row } from "react-bootstrap";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@/context/AuthContext"; // Importe o contexto de autenticação
+import { useAuthContext } from "@/context/AuthContext";
 import ComponentContainerCard from "@/components/ComponentContainerCard";
 import PageMetaData from "@/components/PageMetaData";
 
@@ -18,7 +18,7 @@ interface BannerForm {
 }
 
 const CriarBanner = () => {
-  const { user } = useAuthContext(); // Pegue o usuário do contexto
+  const { user } = useAuthContext();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<BannerForm>({
     title: "",
@@ -30,9 +30,6 @@ const CriarBanner = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  // Verifica permissão ao carregar o componente
-  
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
@@ -51,24 +48,31 @@ const CriarBanner = () => {
     data.append("title", formData.title);
     data.append("description", formData.description);
     if (formData.image) data.append("image", formData.image);
-    data.append("link", formData.link);
+    data.append("url", formData.link);
     data.append("position", formData.position);
-    data.append("status", formData.status);
+    data.append("is_active", formData.status === "ativo" ? "1" : "0");
+
+    // Log para debug
+    for (let [key, value] of data.entries()) {
+        console.log(`${key}: ${value instanceof File ? value.name : value}`);
+    }
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost/myNewApi-1/public/api/banners",
-        data,
-        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
-      );
-      setSuccess("Banner criado com sucesso!");
-      setTimeout(() => navigate("/admin/banners"), 2000);
+        const token = localStorage.getItem("token");
+        const response = await axios.post(
+            "http://localhost/myNewApi-1/public/api/banners",
+            data,
+            { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
+        );
+        console.log("Resposta do servidor:", response.data);
+        setSuccess("Banner criado com sucesso!");
+        setTimeout(() => navigate("/admin/banners"), 2000);
     } catch (err) {
-      const error = err as AxiosError<{ message?: string }>;
-      setError(error.response?.data?.message || "Erro ao criar banner.");
+        const error = err as AxiosError<{ message?: string; errors?: any }>;
+        console.error("Erro ao criar banner:", error.response?.data);
+        setError(error.response?.data?.message || "Erro ao criar banner.");
     }
-  };
+};
 
   if (!user || user.role !== "Administrador") {
     return <Alert variant="danger">{error || "Acesso negado."}</Alert>;
@@ -90,7 +94,6 @@ const CriarBanner = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange as any}
-                  required
                 />
               </Form.Group>
 
@@ -111,6 +114,7 @@ const CriarBanner = () => {
                   name="image"
                   accept="image/*"
                   onChange={handleChange as any}
+                  required // Campo obrigatório
                 />
               </Form.Group>
 
@@ -127,11 +131,18 @@ const CriarBanner = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Posição</Form.Label>
                 <Form.Control
-                  type="text"
+                  as="select"
                   name="position"
                   value={formData.position}
                   onChange={handleChange as any}
-                />
+                  required // Campo obrigatório
+                >
+                  <option value="">Selecione uma posição</option>
+                  <option value="topo">Topo</option>
+                  <option value="lateral">Lateral</option>
+                  <option value="entre_conteudos">Entre Conteúdos</option>
+                  <option value="rodape">Rodapé</option>
+                </Form.Control>
               </Form.Group>
 
               <Form.Group className="mb-3">

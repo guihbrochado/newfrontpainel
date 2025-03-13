@@ -86,12 +86,6 @@ export const MENU_ITEMS: MenuItemType[] = [
         url: "/admin/banners/criar",
         parentKey: "gestao-banners",
       },
-      {
-        key: "banners-relatorios",
-        label: "Relatórios de Banners",
-        url: "/admin/banners/relatorios",
-        parentKey: "gestao-banners",
-      },
     ],
   },
 ];

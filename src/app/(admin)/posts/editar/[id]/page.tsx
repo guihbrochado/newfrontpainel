@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, FormEvent, ChangeEvent } from "react";
-import { Form, Button, Alert, Col, Row } from "react-bootstrap";
+import { Form, Button, Alert, Col, Row, Modal } from "react-bootstrap";
 import ComponentContainerCard from "@/components/ComponentContainerCard";
 import PageMetaData from "@/components/PageMetaData";
 import { EditorRef, EmailEditor, EmailEditorProps } from "react-email-editor";
@@ -21,28 +21,27 @@ interface JSONTemplate {
 }
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
 }
 
 interface Post {
-  id: number;
+  id: string;
   title: string;
   subtitle: string;
   content: string;
-  category_id: number;
+  category_id: string;
   status: string;
   video_url: string;
   audio_url: string;
   tags: string;
   schedule_date: string;
-  image_url: string;
-  video: string;
+  image: string;
   design: JSONTemplate;
 }
 
 const EditarPost = () => {
-  const { id } = useParams<{ id: string }>();
+  const { postId } = useParams<{ postId: string }>();
   const { user, loading } = useAuthContext();
   const navigate = useNavigate();
 
@@ -57,10 +56,12 @@ const EditarPost = () => {
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [tags, setTags] = useState("");
-  const [error, setError] = useState<string | null>("");
-  const [success, setSuccess] = useState<string | null>("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [design, setDesign] = useState<JSONTemplate | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
 
   const emailEditorRef = useRef<EditorRef>(null);
 
@@ -70,21 +71,28 @@ const EditarPost = () => {
       return;
     }
 
+    if (!postId) {
+      setError("ID do post não fornecido.");
+      return;
+    }
+
     const fetchPost = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost/myNewApi-1/public/api/posts/${id}`,
+          `http://localhost/myNewApi-1/public/api/posts/${postId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const post: Post = response.data;
-        setTitle(post.title);
-        setSubtitle(post.subtitle);
-        setVideoUrl(post.video_url);
-        setAudioUrl(post.audio_url);
-        setCategoryId(post.category_id.toString());
-        setStatus(post.status);
-        setScheduleDate(post.schedule_date || "");
+        const post: Post = response.data.data;
+        console.log("Dados recebidos do post:", post);
+
+        setTitle(post.title || "");
+        setSubtitle(post.subtitle || "");
+        setVideoUrl(post.video_url || "");
+        setAudioUrl(post.audio_url || "");
+        setCategoryId(post.category_id || "");
+        setStatus(post.status || "rascunho");
+        setScheduleDate(post.schedule_date ? new Date(post.schedule_date).toISOString().slice(0, 16) : "");
         setTags(post.tags || "");
         setDesign(post.design || {
           counters: {},
@@ -93,6 +101,7 @@ const EditarPost = () => {
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
         setError(error.response?.data?.message || "Erro ao carregar o post.");
+        console.error("Erro ao buscar post:", error.response?.data || error.message);
       }
     };
 
@@ -108,6 +117,7 @@ const EditarPost = () => {
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
         setError(error.response?.data?.message || "Erro ao carregar categorias.");
+        console.error("Erro ao buscar categorias:", error.response?.data || error.message);
       } finally {
         setLoadingCategories(false);
       }
@@ -115,20 +125,22 @@ const EditarPost = () => {
 
     fetchPost();
     fetchCategories();
-  }, [id, user, loading]);
+  }, [postId, user, loading]);
 
-  const exportHtml = (callback: (html: string) => void) => {
+  const exportHtml = (callback: (html: string, design?: JSONTemplate) => void) => {
     const unlayer = emailEditorRef.current?.editor;
     unlayer?.exportHtml((data) => {
-      const { html } = data;
-      callback(html);
+      const { html, design } = data;
+      callback(html, design);
     });
   };
 
   const onReady: EmailEditorProps["onReady"] = (unlayer) => {
     if (design) {
+      console.log("Carregando design no EmailEditor:", design);
       unlayer?.loadDesign(design);
     } else {
+      console.log("Nenhum design encontrado, carregando padrão.");
       unlayer?.loadDesign({
         counters: {},
         body: { id: "default", rows: [], headers: [], footers: [], values: {} },
@@ -136,12 +148,19 @@ const EditarPost = () => {
     }
   };
 
+  const handlePreviewFullScreen = () => {
+    exportHtml((html) => {
+      setPreviewHtml(html);
+      setShowPreview(true);
+    });
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setError(null);
+    setSuccess(null);
 
-    exportHtml(async (html) => {
+    exportHtml(async (html, exportedDesign) => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("subtitle", subtitle);
@@ -154,11 +173,13 @@ const EditarPost = () => {
       if (scheduleDate) formData.append("schedule_date", scheduleDate);
       if (image) formData.append("image", image);
       if (video) formData.append("video", video);
+      if (exportedDesign) formData.append("design", JSON.stringify(exportedDesign));
 
       try {
         const token = localStorage.getItem("token");
-        await axios.put(
-          `http://localhost/myNewApi-1/public/api/posts/${id}`,
+        console.log("Enviando dados para atualização:", Object.fromEntries(formData));
+        const response = await axios.put(
+          `http://localhost/myNewApi-1/public/api/posts/${postId}`,
           formData,
           {
             headers: {
@@ -167,11 +188,14 @@ const EditarPost = () => {
             },
           }
         );
+        console.log("Resposta do servidor:", response.data);
         setSuccess("Post atualizado com sucesso!");
+        setDesign(exportedDesign || design);
         setTimeout(() => navigate("/admin/posts"), 2000);
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
         setError(error.response?.data?.message || "Erro ao atualizar o post.");
+        console.error("Erro na requisição PUT:", error.response?.data || error.message);
       }
     });
   };
@@ -202,8 +226,8 @@ const EditarPost = () => {
       <Row className="justify-content-center">
         <Col md={12} lg={12}>
           <ComponentContainerCard title="Editar Post">
-            {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
+            {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Título</Form.Label>
@@ -229,10 +253,17 @@ const EditarPost = () => {
                 <div>
                   <Button
                     variant="secondary"
-                    className="mb-2"
-                    onClick={() => exportHtml(() => {})}
+                    className="mb-2 me-2"
+                    onClick={() => exportHtml((html) => console.log("HTML exportado:", html))}
                   >
-                    Export HTML
+                    Exportar HTML
+                  </Button>
+                  <Button
+                    variant="info"
+                    className="mb-2"
+                    onClick={handlePreviewFullScreen}
+                  >
+                    Visualizar em Tela Cheia
                   </Button>
                   <EmailEditor ref={emailEditorRef} onReady={onReady} />
                 </div>
@@ -310,7 +341,10 @@ const EditarPost = () => {
 
               <Form.Group className="mb-3">
                 <Form.Label>Status</Form.Label>
-                <Form.Select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <Form.Select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
                   <option value="rascunho">Rascunho</option>
                   <option value="aguardando_aprovacao">Aguardando Aprovação</option>
                   <option value="publicado">Publicado</option>
@@ -330,6 +364,28 @@ const EditarPost = () => {
                 Atualizar Post
               </Button>
             </Form>
+
+            <Modal
+              show={showPreview}
+              onHide={() => setShowPreview(false)}
+              fullscreen={true}
+              dialogClassName="modal-fullscreen"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Pré-visualização do Post</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                  style={{ width: "100%", height: "100%", overflow: "auto" }}
+                />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowPreview(false)}>
+                  Fechar
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </ComponentContainerCard>
         </Col>
       </Row>

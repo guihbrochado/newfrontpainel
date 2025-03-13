@@ -44,7 +44,7 @@ interface BannerFormData {
 
 const ListaBanners = () => {
   const { user } = useAuthContext();
-//  const navigate = useNavigate();
+  //  const navigate = useNavigate();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [error, setError] = useState<string | null>("");
   const [message, setMessage] = useState<string | null>("");
@@ -159,8 +159,14 @@ const ListaBanners = () => {
       formData.append("end_date", bannerData.end_date || "");
       formData.append("is_active", bannerData.is_active ? "1" : "0");
 
+      // Log para verificar os dados enviados
+      console.log("Dados enviados no FormData:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value instanceof File ? `${value.name} (${value.size} bytes)` : value}`);
+      }
+
       if (selectedBanner) {
-        await axios.put(
+        const response = await axios.put(
           `http://localhost/myNewApi-1/public/api/banners/${selectedBanner.id}`,
           formData,
           {
@@ -170,9 +176,17 @@ const ListaBanners = () => {
             },
           }
         );
+        console.log("Resposta do servidor (update):", response.data);
         setBanners(
           banners.map((b) =>
-            b.id === selectedBanner.id ? { ...b, ...bannerData, position: validPosition } : b
+            b.id === selectedBanner.id
+              ? {
+                ...b,
+                ...bannerData,
+                position: validPosition,
+                image_path: response.data.data.image_path || b.image_path, // Atualiza o image_path
+              }
+              : b
           )
         );
         setMessage("Banner atualizado com sucesso!");
@@ -356,15 +370,14 @@ const ListaBanners = () => {
                         setError("A imagem deve ser do tipo PNG, JPG ou GIF.");
                         return;
                       }
+                      console.log("Imagem selecionada:", file.name, file.size, "bytes"); // Log para verificar
+                      setBannerData((prev) => ({ ...prev, image: file }));
                     }
-                    setBannerData((prev) => ({ ...prev, image: file }));
                   }}
                 />
                 {selectedBanner && selectedBanner.image_path && (
                   <img
-                    src={`http://localhost/myNewApi-1/storage/app/public/banners/${selectedBanner.image_path
-                      .split("/")
-                      .pop()}`}
+                    src={`http://localhost/myNewApi-1/storage/app/public/banners/${selectedBanner.image_path.split("/").pop()}`}
                     alt={selectedBanner.title || "Banner"}
                     style={{ maxWidth: "100px", maxHeight: "100px", marginTop: "10px" }}
                   />

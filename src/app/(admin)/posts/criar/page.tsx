@@ -1,25 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, FormEvent, ChangeEvent } from "react";
-import { Form, Button, Col, Row, Alert } from "react-bootstrap";
+import { Form, Button, Col, Row, Alert, Modal } from "react-bootstrap";
 import ComponentContainerCard from "@/components/ComponentContainerCard";
 import PageMetaData from "@/components/PageMetaData";
 import { EditorRef, EmailEditor, EmailEditorProps } from "react-email-editor";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
-
-// Interface ajustada para o JSONTemplate do EmailEditor
-/*interface JSONTemplate {
-  counters: Record<string, any>;
-  body: {
-    id?: string;
-    rows?: any[];
-    headers?: any[];
-    footers?: any[];
-    values?: Record<string, any>;
-  };
-}*/
 
 interface Category {
   id: number;
@@ -41,6 +29,8 @@ const CreatePost = () => {
   const [error, setError] = useState<string | null>("");
   const [success, setSuccess] = useState<string | null>("");
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [showPreview, setShowPreview] = useState(false); // Estado para o modal
+  const [previewHtml, setPreviewHtml] = useState(""); // Estado para armazenar o HTML da pré-visualização
 
   const emailEditorRef = useRef<EditorRef>(null);
   const navigate = useNavigate();
@@ -56,8 +46,8 @@ const CreatePost = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost/myNewApi-1/public/api/categorias", // Alterado para rota pública
-          { headers: { Authorization: `Bearer ${token}` } } // Token ainda enviado, mas opcional
+          "http://localhost/myNewApi-1/public/api/categorias",
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setCategories(response.data);
       } catch (err) {
@@ -81,7 +71,6 @@ const CreatePost = () => {
   };
 
   const onReady: EmailEditorProps["onReady"] = (unlayer) => {
-    // Carregar um design inicial vazio com estrutura correta
     unlayer?.loadDesign({
       counters: {},
       body: {
@@ -94,15 +83,23 @@ const CreatePost = () => {
     });
   };
 
+  // Função para abrir a pré-visualização em tela cheia
+  const handlePreviewFullScreen = () => {
+    exportHtml((html) => {
+      setPreviewHtml(html);
+      setShowPreview(true);
+    });
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-  
+
     const token = localStorage.getItem("token");
     console.log("Token enviado:", token);
     console.log("Usuário atual:", user);
-  
+
     exportHtml(async (html) => {
       const formData = new FormData();
       formData.append("title", title);
@@ -112,11 +109,11 @@ const CreatePost = () => {
       formData.append("status", status);
       formData.append("video_url", videoUrl);
       formData.append("audio_url", audioUrl);
-  
+
       if (tags) formData.append("tags", tags);
       if (scheduleDate) formData.append("schedule_date", scheduleDate);
       if (image) formData.append("image", image);
-  
+
       try {
         const response = await axios.post(
           "http://localhost/myNewApi-1/public/api/posts",
@@ -195,10 +192,17 @@ const CreatePost = () => {
                 <div>
                   <Button
                     variant="secondary"
-                    className="mb-2"
+                    className="mb-2 me-2"
                     onClick={() => exportHtml(() => {})}
                   >
                     Export HTML
+                  </Button>
+                  <Button
+                    variant="info"
+                    className="mb-2"
+                    onClick={handlePreviewFullScreen}
+                  >
+                    Visualizar em Tela Cheia
                   </Button>
                   <EmailEditor ref={emailEditorRef} onReady={onReady} />
                 </div>
@@ -285,6 +289,29 @@ const CreatePost = () => {
                 Publicar
               </Button>
             </Form>
+
+            {/* Modal para visualização em tela cheia */}
+            <Modal
+              show={showPreview}
+              onHide={() => setShowPreview(false)}
+              fullscreen={true}
+              dialogClassName="modal-fullscreen"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Pré-visualização do Post</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                  style={{ width: "100%", height: "100%", overflow: "auto" }}
+                />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowPreview(false)}>
+                  Fechar
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </ComponentContainerCard>
         </Col>
       </Row>

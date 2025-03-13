@@ -104,9 +104,7 @@ const CategoriesChart = () => {
           <>
             <ReactApexChart height={265} options={chartOptions} series={chartOptions.series} type="bar" />
             <div className="text-center">
-              <Button type="button" variant="primary" className="mx-auto icons-center gap-1">
-                Ver Mais <IconifyIcon icon="fa6-solid:arrow-right-long" />
-              </Button>
+              
             </div>
           </>
         )}

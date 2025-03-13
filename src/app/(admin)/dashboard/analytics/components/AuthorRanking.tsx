@@ -52,14 +52,6 @@ const AuthorRanking = () => {
     fetchTopAuthors(period);
   }, [period]);
 
-  // Mapear os períodos do dropdown para os valores da API
-  const periodOptions = [
-    { label: 'Hoje', value: 'today' },
-    { label: 'Última Semana', value: 'week' },
-    { label: 'No Mês', value: 'month' },
-    { label: 'Esse Ano', value: 'year' },
-  ];
-
   return (
     <Card>
       <CardHeader>
@@ -67,26 +59,7 @@ const AuthorRanking = () => {
           <Col>
             <CardTitle>Autores que mais publicam</CardTitle>
           </Col>
-          <Col xs="auto">
-            <Dropdown>
-              <DropdownToggle className="btn btn-light">
-                <i className="icofont-calendar fs-5 me-1" />
-                {periodOptions.find(opt => opt.value === period)?.label || 'No Mês'}
-                <IconifyIcon icon="la:angle-down" className="ms-1" />
-              </DropdownToggle>
-              <DropdownMenu align={'end'}>
-                {periodOptions.map((opt) => (
-                  <DropdownItem
-                    key={opt.value}
-                    onClick={() => setPeriod(opt.value)}
-                    active={period === opt.value}
-                  >
-                    {opt.label}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-          </Col>
+        
         </Row>
       </CardHeader>
       <CardBody className="pt-0">

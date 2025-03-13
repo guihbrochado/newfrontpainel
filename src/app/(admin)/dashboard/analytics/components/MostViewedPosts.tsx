@@ -31,21 +31,7 @@ const MostViewedPosts = () => {
           <Col>
             <CardTitle>Mais Visualizados</CardTitle>
           </Col>
-          <Col xs="auto">
-            <Dropdown>
-              <DropdownToggle className="btn bt btn-light">
-                <i className="icofont-calendar fs-5 me-1" />
-                No mês
-                <i className="ms-1 icofont-caret-down" />
-              </DropdownToggle>
-              <DropdownMenu align={'end'}>
-                <DropdownItem href="#">Hoje</DropdownItem>
-                <DropdownItem href="#">Última Semana</DropdownItem>
-                <DropdownItem href="#">Último Mês</DropdownItem>
-                <DropdownItem href="#">Esse Ano</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </Col>
+          
         </Row>
       </CardHeader>
       <CardBody className="pt-0">
