@@ -65,7 +65,6 @@ const EditarPost = () => {
 
   const emailEditorRef = useRef<EditorRef>(null);
 
-  // Definir a URL base da API a partir da variável de ambiente
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -82,30 +81,69 @@ const EditarPost = () => {
     const fetchPost = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("Token usado:", token);
-        const response = await axios.get(
-          `${API_URL}/posts/${postId}`, // Usar a variável de ambiente
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.get(`${API_URL}/posts/${postId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const post: Post = response.data.data;
         console.log("Dados recebidos do post:", post);
-    
+
         setTitle(post.title || "");
         setSubtitle(post.subtitle || "");
         setVideoUrl(post.video_url || "");
         setAudioUrl(post.audio_url || "");
         setCategoryId(post.category_id || "");
         setStatus(post.status || "rascunho");
-        setScheduleDate(post.schedule_date ? new Date(post.schedule_date).toISOString().slice(0, 16) : "");
+        setScheduleDate(
+          post.schedule_date ? new Date(post.schedule_date).toISOString().slice(0, 16) : ""
+        );
         setTags(post.tags || "");
-        setDesign(post.design || {
+
+        const defaultDesign = {
           counters: {},
-          body: { id: "default", rows: [], headers: [], footers: [], values: {} },
-        });
+          body: {
+            id: "default",
+            rows: [],
+            headers: [],
+            footers: [],
+            values: {},
+          },
+        };
+        const postDesign = post.design || defaultDesign;
+        setDesign(postDesign);
+
+        if (post.content) {
+          const designWithContent = {
+            ...postDesign,
+            body: {
+              ...postDesign.body,
+              rows: postDesign.body.rows.length > 0
+                ? postDesign.body.rows
+                : [
+                    {
+                      cells: [1],
+                      columns: [
+                        {
+                          contents: [
+                            {
+                              type: "text",
+                              values: {
+                                text: post.content,
+                              },
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+            },
+          };
+          if (emailEditorRef.current?.editor) {
+            emailEditorRef.current.editor.loadDesign(designWithContent);
+          }
+        }
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
         setError(error.response?.data?.message || "Erro ao carregar o post.");
-        console.error("Erro ao buscar post:", error.response?.data || error.message);
       }
     };
 
@@ -113,15 +151,13 @@ const EditarPost = () => {
       setLoadingCategories(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${API_URL}/posts-categories`, // Usar a variável de ambiente
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.get(`${API_URL}/posts-categories`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setCategories(response.data);
       } catch (err) {
         const error = err as AxiosError<{ message?: string }>;
         setError(error.response?.data?.message || "Erro ao carregar categorias.");
-        console.error("Erro ao buscar categorias:", error.response?.data || error.message);
       } finally {
         setLoadingCategories(false);
       }
@@ -133,7 +169,11 @@ const EditarPost = () => {
 
   const exportHtml = (callback: (html: string, design?: JSONTemplate) => void) => {
     const unlayer = emailEditorRef.current?.editor;
-    unlayer?.exportHtml((data) => {
+    if (!unlayer) {
+      callback("");
+      return;
+    }
+    unlayer.exportHtml((data) => {
       const { html, design } = data;
       callback(html, design);
     });
@@ -141,14 +181,7 @@ const EditarPost = () => {
 
   const onReady: EmailEditorProps["onReady"] = (unlayer) => {
     if (design) {
-      console.log("Carregando design no EmailEditor:", design);
-      unlayer?.loadDesign(design);
-    } else {
-      console.log("Nenhum design encontrado, carregando padrão.");
-      unlayer?.loadDesign({
-        counters: {},
-        body: { id: "default", rows: [], headers: [], footers: [], values: {} },
-      });
+      unlayer.loadDesign(design);
     }
   };
 
@@ -163,42 +196,62 @@ const EditarPost = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-  
+
     exportHtml(async (html, exportedDesign) => {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("subtitle", subtitle);
-      formData.append("content", html);
-      formData.append("category_id", categoryId);
-      formData.append("status", status);
-      formData.append("video_url", videoUrl);
-      formData.append("audio_url", audioUrl);
-      formData.append("tags", tags);
-      if (scheduleDate) formData.append("schedule_date", scheduleDate);
-      if (image) formData.append("image", image);
-      if (exportedDesign) formData.append("design", JSON.stringify(exportedDesign));
-  
+      if (!title || !html || !categoryId || !status) {
+        setError("Preencha todos os campos obrigatórios: Título, Conteúdo, Categoria e Status.");
+        return;
+      }
+
+      // Dados de texto como JSON
+      const data = {
+        title,
+        subtitle: subtitle || undefined,
+        content: html,
+        category_id: categoryId,
+        status,
+        video_url: videoUrl || undefined,
+        audio_url: audioUrl || undefined,
+        tags: tags || undefined,
+        schedule_date: scheduleDate || undefined,
+        design: exportedDesign ? JSON.stringify(exportedDesign) : undefined,
+      };
+
       try {
         const token = localStorage.getItem("token");
-        console.log("Enviando dados para atualização:", Object.fromEntries(formData));
-        const response = await axios.put(
-          `${API_URL}/posts/${postId}`, // Usar a variável de ambiente
-          formData,
-          {
+
+        // Primeiro, envia os dados de texto (JSON)
+        const textResponse = await axios.put(`${API_URL}/posts/${postId}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Se houver imagem, faz um segundo request com FormData
+        if (image) {
+          const formData = new FormData();
+          formData.append("image", image);
+          await axios.post(`${API_URL}/posts/${postId}/upload-image`, formData, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
-          }
-        );
-        console.log("Resposta do servidor:", response.data);
+          });
+        }
+
         setSuccess("Post atualizado com sucesso!");
         setDesign(exportedDesign || design);
         setTimeout(() => navigate("/admin/posts"), 2000);
       } catch (err) {
-        const error = err as AxiosError<{ message?: string }>;
-        console.log("Erro completo:", error.response);
-        setError(error.response?.data?.message || "Erro ao atualizar o post.");
+        const error = err as AxiosError<{ message?: string; errors?: Record<string, string[]> }>;
+        const errorMessage = error.response?.data?.message || "Erro ao atualizar o post.";
+        const validationErrors = error.response?.data?.errors
+          ? Object.entries(error.response.data.errors)
+              .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+              .join("; ")
+          : "";
+        setError(`${errorMessage}${validationErrors ? " - " + validationErrors : ""}`);
       }
     });
   };
@@ -216,10 +269,10 @@ const EditarPost = () => {
   if (loading) {
     return (
       <Row className="justify-content-center">
-      <Col md={12} lg={12}>
-        <div>Carregando...</div>
-      </Col>
-    </Row>
+        <Col md={12} lg={12}>
+          <div>Carregando...</div>
+        </Col>
+      </Row>
     );
   }
 
@@ -347,6 +400,7 @@ const EditarPost = () => {
                 <Form.Select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
+                  required
                 >
                   <option value="rascunho">Rascunho</option>
                   <option value="aguardando_aprovacao">Aguardando Aprovação</option>

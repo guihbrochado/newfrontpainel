@@ -186,7 +186,7 @@ const ListaBanners = () => {
                 ...b,
                 ...bannerData,
                 position: validPosition,
-                image_path: response.data.data.image_path || b.image_path, // Atualiza o image_path
+                image_path: response.data.data.image_path || b.image_path,
               }
               : b
           )
