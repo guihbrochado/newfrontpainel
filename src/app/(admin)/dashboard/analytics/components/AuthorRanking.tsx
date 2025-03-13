@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import defaultImage from '@/assets/images/user.png'; // Importe a imagem padrão
 
 type AuthorData = {
   id: string;
@@ -46,7 +46,6 @@ const AuthorRanking = () => {
     }
   };
 
-
   // Buscar dados quando o componente montar ou o período mudar
   useEffect(() => {
     fetchTopAuthors(period);
@@ -59,7 +58,6 @@ const AuthorRanking = () => {
           <Col>
             <CardTitle>Autores que mais publicam</CardTitle>
           </Col>
-        
         </Row>
       </CardHeader>
       <CardBody className="pt-0">
@@ -78,10 +76,11 @@ const AuthorRanking = () => {
                     <td className="px-0">
                       <div className="d-flex align-items-center">
                         <img
-                          src={author.image}
+                          src={author.image && author.image.trim() !== '' ? author.image : defaultImage}
                           height={36}
                           className="me-2 align-self-center rounded"
                           alt={author.name}
+                          onError={(e) => (e.currentTarget.src = defaultImage)} // Fallback adicional
                         />
                         <div className="flex-grow-1 text-truncate">
                           <h6 className="m-0 text-truncate">{author.name}</h6>

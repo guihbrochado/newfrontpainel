@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ProgressBar, Row } from 'react-bootstrap';
+import { Card, CardBody, CardHeader, CardTitle, Col, ProgressBar, Row } from 'react-bootstrap';
 import axios from 'axios';
+import defaultImage from '@/assets/images/user.png'; // Importe a imagem padrão
 
 const MostViewedPosts = () => {
   const [posts, setPosts] = useState<{ id: number; title: string; views: number; progress: number; image: string; author: string; }[]>([]);
@@ -31,7 +32,6 @@ const MostViewedPosts = () => {
           <Col>
             <CardTitle>Mais Visualizados</CardTitle>
           </Col>
-          
         </Row>
       </CardHeader>
       <CardBody className="pt-0">
@@ -47,7 +47,12 @@ const MostViewedPosts = () => {
                   <tr key={idx}>
                     <td className="px-0">
                       <div className="d-flex align-items-center">
-                        <img src={post.image} className="me-2 align-self-center thumb-md" alt="..." />
+                        <img
+                          src={post.image && post.image.trim() !== '' ? post.image : defaultImage}
+                          className="me-2 align-self-center thumb-md"
+                          alt={post.title}
+                          onError={(e) => (e.currentTarget.src = defaultImage)} // Fallback adicional
+                        />
                         <div className="flex-grow-1 text-truncate">
                           <h6 className="m-0 text-truncate">{post.title}</h6>
                           <small className="text-muted">Por {post.author}</small>
